@@ -34,7 +34,7 @@ rankhospital <- function(state, outcome, num = "best") {
   # Extract hospital names and 30-day death rates for specified outcome
   data_for_state <- full_data[full_data$State == state, c("Hospital.Name", column)]
   # Convert 30-day death rate to numeric (as all variables were read as characters)
-  data_for_state[, 2] <- as.numeric(data_for_state[, 2])
+  data_for_state[, column] <- as.numeric(data_for_state[, column])
   
   # Sort data frame by increasing 30-day death rate, then by increasing hospital name to break ties
   data_for_state <- data_for_state[order(data_for_state[column], data_for_state$Hospital.Name, na.last = NA), ]
