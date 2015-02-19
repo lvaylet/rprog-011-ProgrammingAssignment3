@@ -42,28 +42,28 @@ rankall <- function(outcome, num = "best") {
   data_all_states <- full_data[, c("State", "Hospital.Name", column)]
 
   # Convert 30-day death rate to numeric (as all variables were read as characters)
-  data_all_states[, column] <- as.numeric(data_all_states[, column])
+  data_all_states[, column] <- suppressWarnings(as.numeric(data_all_states[, column]))
   
   # Sort data frame by state, then by increasing 30-day death rate, then by increasing hospital name to break ties
   data_all_states <- data_all_states[order(data_all_states$State, data_all_states[column], data_all_states$Hospital.Name, na.last = NA), ]
   
-  # Extract names of all states and loop over them to get hospital name with requested rank
-  result.state <- sort(unique(data_all_states$State))
-  result.hospital = rep(NA, length(result.state))
-  for (i in 1:length(result.state)) {
-    data_for_state <- data_all_states[data_all_states$State == result.state[i], ]
-    
-    # Return hospital name with lowest 30-day death rate
-    result.hospital[i] <- if (num == "best") {
-      data_for_state$Hospital.Name[1] 
+  # Split full data for each state, then use lapply to 
+  data_by_state <- split(data_all_states, data_all_states$State)
+  
+  helper <- function(data_state, num) {
+    # Return hospital name with reauested 30-day death rate
+    r <- if (num == "best") {
+      data_state$Hospital.Name[1] 
     } else if (num == "worst") {
-      data_for_state$Hospital.Name[length(data_for_state$Hospital.Name)]
-    } else if (num <= length(data_for_state$Hospital.Name)) {
-      data_for_state$Hospital.Name[num]
+      data_state$Hospital.Name[length(data_state$Hospital.Name)]
+    } else if (num <= length(data_state$Hospital.Name)) {
+      data_state$Hospital.Name[num]
     } else {
       NA
     }
   }
   
-  return(data.frame(hospital = result.hospital, state = result.state))
+  result <- lapply(data_by_state, helper, num)
+  
+  return(data.frame(hospital = unlist(result), state = names(result), row.names = names(result)))
 }
