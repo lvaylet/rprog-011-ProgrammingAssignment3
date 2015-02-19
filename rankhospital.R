@@ -39,7 +39,7 @@ rankhospital <- function(state, outcome, num = "best") {
   # Sort data frame by increasing 30-day death rate, then by increasing hospital name to break ties
   data_for_state <- data_for_state[order(data_for_state[column], data_for_state$Hospital.Name, na.last = NA), ]
   
-  # Return hospital name with lowest 30-day death rate
+  # Return hospital name with requested 30-day death rate
   hospital <- if (num == "best") {
     data_for_state$Hospital.Name[1] 
   } else if (num == "worst") {
